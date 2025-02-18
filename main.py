@@ -9,13 +9,13 @@ from pprint import pprint
 from func import backtest
 
 
-def generate_etime_close_data_divd_time(date_bgn:str, date_end:str, str_index_code:str, int_frequency:int) -> pd.DataFrame:
+def get_data_by_date(date_bgn:str, date_end:str, str_index_code:str, int_frequency:int) -> pd.DataFrame:
     """从总数据集中按照date_bgn和date_end筛选要进行后续因子测试的数据
 
     Args:
         date_bgn (str): 开始日期
         date_end (str): 结束日期
-        str_index_code (str): 指数代码
+        str_index_code (str): 商品代码
         int_frequency (int): 需要预测的bar数量
 
     Returns:
@@ -48,7 +48,7 @@ def iter_func(params:list) -> pd.DataFrame:
     # 表格构建 !!!!!这里应该用index进行对齐!!!!!
     df_data["fct"] = ser_fct_series.values
     # n_days非常重要,调节我们的预测步长，
-    ind_frame = backtest(original_data=df_data, index_code="510050", frequency=int_freq, n_days=1)
+    ind_frame = backtest(df_data=df_data, str_index_code="510050", int_frequency=int_freq, int_n=1)
 
     print('frequency: {}\nfct_name: {}\n'.format(int_freq, str_col_name))
     print(ind_frame)
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     int_freq = 15
 
     # 引入行情数据，注意日期
-    df_original =  generate_etime_close_data_divd_time(date_bgn='2005-02-23', date_end='2022-11-30', str_index_code='510050.SH', int_frequency=int_freq)
+    df_original =  get_data_by_date(date_bgn='2005-02-23', date_end='2022-11-30', str_index_code='510050.SH', int_frequency=int_freq)
     df_fct = pd.read_csv(str_file_path, index_col=0)
 
     inputs = []
