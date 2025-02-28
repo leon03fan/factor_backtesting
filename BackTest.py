@@ -55,6 +55,9 @@ class BackTest:
         # 计算累计手续费
         cumu_fees = arr_cumu_fees.sum()
 
+        # 统计记录条数
+        int_record_num = len(df_data)
+
         metrics.update({
         '总收益': arr_nav.iloc[-1] - 1,
         '年化收益': annual_return,
@@ -66,7 +69,8 @@ class BackTest:
         '总交易次数': len(arr_returns),
         '胜率': win_rate,
         '盈亏比': gain_loss_ratio,
-        '累计手续费': cumu_fees
+        '累计手续费': cumu_fees,
+        '记录条数': int_record_num
         })
         return metrics
 
@@ -122,12 +126,8 @@ class BackTest:
         df_temp = df_temp.dropna(axis=0).reset_index(drop=True)
 
         # 3. 训练集和测试集划分 !!!这里改成动态分配！！！！
-        # 后期修改 数据如果超过2000条，则按照80%和20%的比例划分训练集和测试集
-        idx_train_set_end = df_temp[
-            (df_temp["etime"].dt.year == 2019) &
-            (df_temp["etime"].dt.month == 12) &
-            (df_temp["etime"].dt.day == 31)
-            ].index[0]
+        # 数据按照80%和20%的比例划分训练集和测试集、
+        idx_train_set_end = int(len(df_temp) * 0.7)
 
         X_train = df_temp.loc[:idx_train_set_end,"fct"].values.reshape(-1,1) # 因子值作为X
         Y_train = df_temp.loc[:idx_train_set_end,"ret"].values.reshape(-1,1) # 净收益率作为Y
