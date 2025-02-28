@@ -37,7 +37,7 @@ class BackTest:
         # -------夏普比率
         sharpe = (annual_return - rf) / annual_date_std if annual_date_std != 0 else 0 # 夏普比率
 
-        # 计算最大回撤及其起始日期
+        # 计算最大回撤及其起始bar时间
         drawdown = arr_nav.cummax() - arr_nav
         max_drawdown = drawdown.max() / arr_nav.cummax().max()
         max_drawdown_end_idx = drawdown.argmax()
