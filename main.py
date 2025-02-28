@@ -6,7 +6,7 @@ import warnings
 warnings.filterwarnings("ignore")
 from pprint import pprint
 
-from func import backtest
+from BackTest import BackTest as bt
 
 
 def get_data_by_date(date_bgn:str, date_end:str, str_index_code:str, int_frequency:int) -> pd.DataFrame:
@@ -26,7 +26,6 @@ def get_data_by_date(date_bgn:str, date_end:str, str_index_code:str, int_frequen
 
     df_bar["etime"] = pd.to_datetime(df_bar["etime"])
     df_bar["tdate"] = pd.to_datetime(df_bar["etime"]).dt.date
-    df_bar["label"] = "-1"
     dt_bgn = pd.to_datetime(date_bgn)
     dt_end = pd.to_datetime(date_end)
     ser_mask = df_bar["etime"].between(dt_bgn, dt_end)
@@ -48,13 +47,17 @@ def iter_func(params:list) -> pd.DataFrame:
     # 表格构建 !!!!!这里应该用index进行对齐!!!!!
     df_data["fct"] = ser_fct_series.values
     # n_days非常重要,调节我们的预测步长，
-    ind_frame = backtest(df_data=df_data, str_index_code="510050", int_frequency=int_freq, int_n=1)
 
-    print('frequency: {}\nfct_name: {}\n'.format(int_freq, str_col_name))
+    obj_bt = bt(df_data=df_data, str_index_code="510050", int_frequency=int_freq, int_n=1)
+    ind_frame = obj_bt.backtest()
+
+    print(f'frequency: {int_freq}')
+    print(f'fct_name: {str_col_name}')
     print(ind_frame)
-    print('\n')
-    print('夏普比率（样本外）：{}\n\n'.format(ind_frame.loc['样本外', '夏普比率']))  # 输出样本外夏普比率
-
+    print(f"")
+    print(f"")
+    print(f"夏普比率（样本外）：{ind_frame.loc['样本外', '夏普比率']}")  # 输出样本外夏普比率
+    print(f"**************" * 10)
     ind_frame['params'] = str_col_name
 
     return ind_frame
@@ -76,7 +79,6 @@ if __name__ == "__main__":
     inputs = []
     for str_fct_name in df_fct.columns:
         inputs.append((int_freq, str_fct_name, df_fct[str_fct_name], df_original)) 
-    # pprint(inputs)    
 
     # 周期频率，因子名称，对应的因子数据，etime，tdate，close
     with ProcessPoolExecutor(max_workers=int_job_num) as executor:
